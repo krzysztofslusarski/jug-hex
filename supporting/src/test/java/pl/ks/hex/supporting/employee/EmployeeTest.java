@@ -1,5 +1,7 @@
 package pl.ks.hex.supporting.employee;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigDecimal;
@@ -14,11 +16,13 @@ class EmployeeTest {
 
     private final EmployeeSubService employeeSubService = employeeConfiguration.employeeSubService();
     private final EmployeeService employeeService = employeeConfiguration.employeeService(employeeSubService);
+    private final EmployeeQueryRepository employeeQueryRepository = employeeConfiguration.employeeQueryRepository();
 
     @Test
     void shouldAcceptNewTimesheet() {
         EmployeeId id = employeeService.createNew(FirstName.of("Krzys"), LastName.of("S"), Money.of(BigDecimal.TEN));
         employeeService.addNewTimesheet(id, WorkHours.of(100));
+        assertEquals(1, employeeQueryRepository.findAll().size());
     }
 
     @Test
@@ -35,6 +39,7 @@ class EmployeeTest {
         EmployeeId id = employeeService.createNew(FirstName.of("Krzys"), LastName.of("S"), Money.of(BigDecimal.TEN));
         employeeService.addNewTimesheet(id, WorkHours.of(100));
         employeeService.settleNewInvoice(id, Money.of(BigDecimal.valueOf(1000L)));
+        assertNull(employeeQueryRepository.getById(id).getLastNotSettledTimesheetWorkTime());
     }
 
     @Test

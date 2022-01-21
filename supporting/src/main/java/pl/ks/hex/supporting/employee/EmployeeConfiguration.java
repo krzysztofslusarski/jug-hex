@@ -18,4 +18,9 @@ class EmployeeConfiguration {
     EmployeeService employeeService(EmployeeSubService employeeSubService) {
         return new EmployeeServiceImpl(employeeRepository, employeeSubService);
     }
+
+    @Bean
+    EmployeeQueryRepository employeeQueryRepository() {
+        return new EmployeeQueryRepositoryImpl(employeeRepository);
+    }
 }
