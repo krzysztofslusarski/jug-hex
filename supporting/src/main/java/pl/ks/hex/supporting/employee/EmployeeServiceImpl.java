@@ -2,7 +2,6 @@ package pl.ks.hex.supporting.employee;
 
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.transaction.annotation.Transactional;
 import pl.ks.hex.common.model.FirstName;
 import pl.ks.hex.common.model.LastName;
 import pl.ks.hex.common.model.Money;
@@ -11,9 +10,9 @@ import pl.ks.hex.common.model.WorkHours;
 @RequiredArgsConstructor
 class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
+    private final EmployeeSubService employeeSubService;
 
     @Override
-    @Transactional
     public EmployeeId createNew(FirstName firstName, LastName lastName, Money hourlyEarnings) {
         Employee employee = new Employee();
         employee.setFirstName(firstName);
@@ -24,7 +23,6 @@ class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    @Transactional
     public void addNewTimesheet(EmployeeId employeeId, WorkHours hours) {
         Employee employee = employeeRepository.getById(employeeId);
         if (employee.getLastNotSettledTimesheetWorkTime() != null) {
@@ -35,7 +33,6 @@ class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    @Transactional
     public void settleNewInvoice(EmployeeId employeeId, Money payment) {
         Employee employee = employeeRepository.getById(employeeId);
         if (employee.getLastNotSettledTimesheetWorkTime() == null) {

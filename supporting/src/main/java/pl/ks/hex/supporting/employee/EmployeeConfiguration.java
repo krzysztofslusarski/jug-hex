@@ -10,7 +10,12 @@ class EmployeeConfiguration {
     private final EmployeeRepository employeeRepository;
 
     @Bean
-    EmployeeService employeeService() {
-        return new EmployeeServiceImpl(employeeRepository);
+    EmployeeSubService employeeSubService() {
+        return new EmployeeSubServiceImpl(employeeRepository);
+    }
+
+    @Bean
+    EmployeeService employeeService(EmployeeSubService employeeSubService) {
+        return new EmployeeServiceImpl(employeeRepository, employeeSubService);
     }
 }
