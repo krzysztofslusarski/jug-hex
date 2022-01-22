@@ -34,14 +34,14 @@ class EmployeeTest {
     void shouldAcceptInvoiceToTheTimesheet() {
         EmployeeId id = employeeService.createNew(FirstName.of("Krzys"), LastName.of("S"), Money.of(BigDecimal.TEN));
         employeeService.addNewTimesheet(id, WorkHours.of(100));
-        employeeService.settleNewInvoice(id, Money.of(BigDecimal.valueOf(1000L)));
+        employeeService.addNewInvoice(id, Money.of(BigDecimal.valueOf(1000L)));
     }
 
     @Test
     void shouldAcceptSecondTimesheetAfterInvoice() {
         EmployeeId id = employeeService.createNew(FirstName.of("Krzys"), LastName.of("S"), Money.of(BigDecimal.TEN));
         employeeService.addNewTimesheet(id, WorkHours.of(100));
-        employeeService.settleNewInvoice(id, Money.of(BigDecimal.valueOf(1000L)));
+        employeeService.addNewInvoice(id, Money.of(BigDecimal.valueOf(1000L)));
         employeeService.addNewTimesheet(id, WorkHours.of(100));
     }
 
@@ -50,7 +50,7 @@ class EmployeeTest {
         EmployeeId id = employeeService.createNew(FirstName.of("Krzys"), LastName.of("S"), Money.of(BigDecimal.TEN));
         employeeService.addNewTimesheet(id, WorkHours.of(100));
         assertThrows(IllegalArgumentException.class, () -> {
-            employeeService.settleNewInvoice(id, Money.of(BigDecimal.valueOf(1001L)));
+            employeeService.addNewInvoice(id, Money.of(BigDecimal.valueOf(1001L)));
         });
     }
 }

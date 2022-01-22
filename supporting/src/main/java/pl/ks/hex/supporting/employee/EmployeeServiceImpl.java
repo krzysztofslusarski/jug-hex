@@ -26,14 +26,14 @@ class EmployeeServiceImpl implements EmployeeService {
     public void addNewTimesheet(EmployeeId employeeId, WorkHours hours) {
         Employee employee = employeeRepository.getById(employeeId);
         if (employee.getLastNotSettledTimesheetWorkTime() != null) {
-            throw new IllegalArgumentException("You need to first settle the invoice");
+            throw new IllegalArgumentException("You need to add the invoice");
         }
         employee.setLastNotSettledTimesheetWorkTime(hours);
         employeeRepository.save(employee);
     }
 
     @Override
-    public void settleNewInvoice(EmployeeId employeeId, Money payment) {
+    public void addNewInvoice(EmployeeId employeeId, Money payment) {
         Employee employee = employeeRepository.getById(employeeId);
         if (employee.getLastNotSettledTimesheetWorkTime() == null) {
             throw new IllegalArgumentException("You need to first add a new timesheet");
