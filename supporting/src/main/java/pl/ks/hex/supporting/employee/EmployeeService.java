@@ -10,5 +10,5 @@ public interface EmployeeService {
 
     void addNewTimesheet(EmployeeId employeeId, WorkHours hours);
 
-    void settleNewInvoice(EmployeeId employeeId, Money payment);
+    void addNewInvoice(EmployeeId employeeId, Money payment);
 }
