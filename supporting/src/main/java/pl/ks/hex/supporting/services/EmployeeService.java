@@ -27,7 +27,7 @@ public class EmployeeService {
     public void addNewTimesheet(UUID employeeId, int hours) {
         Employee employee = employeeRepository.getById(employeeId);
         if (employee.getLastNotSettledTimesheetWorkTime() != null) {
-            throw new IllegalArgumentException("You need to first settle the invoice");
+            throw new IllegalArgumentException("You need to first add the invoice");
         }
         employee.setLastNotSettledTimesheetWorkTime(hours);
     }
