@@ -32,6 +32,10 @@ public class Money implements Comparable<Money>, Serializable {
         return valuePln.compareTo(other.valuePln);
     }
 
+    public Money add(Money money) {
+        return Money.of(money.valuePln.add(valuePln));
+    }
+
     public Money multiply(BigDecimal multiplier) {
         return Money.of(valuePln.multiply(multiplier));
     }
