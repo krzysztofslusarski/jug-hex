@@ -17,13 +17,13 @@ class EmployeeTest {
 
     @Test
     void shouldAcceptNewTimesheet() {
-        EmployeeId id = employeeService.createNew(FirstName.of("Krzys"), LastName.of("S"), Money.of(BigDecimal.TEN));
+        EmployeeId id = employeeService.createNew(FirstName.of("Krzysztof"), LastName.of("Ślusarski"), Money.of(BigDecimal.TEN));
         employeeService.addNewTimesheet(id, WorkHours.of(100));
     }
 
     @Test
     void shouldNotAcceptSecondTimesheetWithoutInvoice() {
-        EmployeeId id = employeeService.createNew(FirstName.of("Krzys"), LastName.of("S"), Money.of(BigDecimal.TEN));
+        EmployeeId id = employeeService.createNew(FirstName.of("Krzysztof"), LastName.of("Ślusarski"), Money.of(BigDecimal.TEN));
         employeeService.addNewTimesheet(id, WorkHours.of(100));
         assertThrows(IllegalArgumentException.class, () -> {
             employeeService.addNewTimesheet(id, WorkHours.of(100));
@@ -32,14 +32,14 @@ class EmployeeTest {
 
     @Test
     void shouldAcceptInvoiceToTheTimesheet() {
-        EmployeeId id = employeeService.createNew(FirstName.of("Krzys"), LastName.of("S"), Money.of(BigDecimal.TEN));
+        EmployeeId id = employeeService.createNew(FirstName.of("Krzysztof"), LastName.of("Ślusarski"), Money.of(BigDecimal.TEN));
         employeeService.addNewTimesheet(id, WorkHours.of(100));
         employeeService.addNewInvoice(id, Money.of(BigDecimal.valueOf(1000L)));
     }
 
     @Test
     void shouldAcceptSecondTimesheetAfterInvoice() {
-        EmployeeId id = employeeService.createNew(FirstName.of("Krzys"), LastName.of("S"), Money.of(BigDecimal.TEN));
+        EmployeeId id = employeeService.createNew(FirstName.of("Krzysztof"), LastName.of("Ślusarski"), Money.of(BigDecimal.TEN));
         employeeService.addNewTimesheet(id, WorkHours.of(100));
         employeeService.addNewInvoice(id, Money.of(BigDecimal.valueOf(1000L)));
         employeeService.addNewTimesheet(id, WorkHours.of(100));
@@ -47,7 +47,7 @@ class EmployeeTest {
 
     @Test
     void shouldNotAcceptInvoiceWithWrongAmount() {
-        EmployeeId id = employeeService.createNew(FirstName.of("Krzys"), LastName.of("S"), Money.of(BigDecimal.TEN));
+        EmployeeId id = employeeService.createNew(FirstName.of("Krzysztof"), LastName.of("Ślusarski"), Money.of(BigDecimal.TEN));
         employeeService.addNewTimesheet(id, WorkHours.of(100));
         assertThrows(IllegalArgumentException.class, () -> {
             employeeService.addNewInvoice(id, Money.of(BigDecimal.valueOf(1001L)));
