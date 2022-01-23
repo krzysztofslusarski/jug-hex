@@ -5,18 +5,18 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 class EmployeeQueryRepositoryImpl implements EmployeeQueryRepository {
-    private final EmployeeRepository employeeRepository;
+    private final EmployeePrivateRepository employeePrivateRepository;
 
     @Override
     public List<EmployeeDto> findAll() {
-        return employeeRepository.findAll().stream()
+        return employeePrivateRepository.findAll().stream()
                 .map(this::map)
                 .toList();
     }
 
     @Override
     public EmployeeDto getById(EmployeeId employeeId) {
-        return map(employeeRepository.getById(employeeId));
+        return map(employeePrivateRepository.getById(employeeId));
     }
 
     private EmployeeDto map(Employee employee) {

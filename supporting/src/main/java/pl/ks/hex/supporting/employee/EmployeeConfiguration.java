@@ -7,20 +7,15 @@ import org.springframework.context.annotation.Configuration;
 @RequiredArgsConstructor
 @Configuration(proxyBeanMethods = false)
 class EmployeeConfiguration {
-    private final EmployeeRepository employeeRepository;
-
-    @Bean
-    EmployeeSubService employeeSubService() {
-        return new EmployeeSubServiceImpl(employeeRepository);
-    }
-
-    @Bean
-    EmployeeService employeeService(EmployeeSubService employeeSubService) {
-        return new EmployeeServiceImpl(employeeRepository, employeeSubService);
-    }
+    private final EmployeePrivateRepository employeePrivateRepository;
 
     @Bean
     EmployeeQueryRepository employeeQueryRepository() {
-        return new EmployeeQueryRepositoryImpl(employeeRepository);
+        return new EmployeeQueryRepositoryImpl(employeePrivateRepository);
+    }
+
+    @Bean
+    EmployeeRepository employeeRepository() {
+        return employeePrivateRepository;
     }
 }

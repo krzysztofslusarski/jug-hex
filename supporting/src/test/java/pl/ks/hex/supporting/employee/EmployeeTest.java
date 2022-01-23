@@ -14,48 +14,49 @@ import pl.ks.hex.common.model.WorkHours;
 class EmployeeTest {
     private final EmployeeConfiguration employeeConfiguration = new EmployeeConfiguration(new MockEmployeeRepository());
 
-    private final EmployeeSubService employeeSubService = employeeConfiguration.employeeSubService();
-    private final EmployeeService employeeService = employeeConfiguration.employeeService(employeeSubService);
     private final EmployeeQueryRepository employeeQueryRepository = employeeConfiguration.employeeQueryRepository();
+    private final EmployeeRepository employeeRepository = employeeConfiguration.employeeRepository();
 
     @Test
     void shouldAcceptNewTimesheet() {
-        EmployeeId id = employeeService.createNew(FirstName.of("Krzysztof"), LastName.of("Ślusarski"), Money.of(BigDecimal.TEN));
-        employeeService.addNewTimesheet(id, WorkHours.of(100));
+        Employee employee = new Employee(FirstName.of("Krzysztof"), LastName.of("Ślusarski"), Money.of(BigDecimal.TEN));
+        employee.addNewTimesheet(WorkHours.of(100));
+        employeeRepository.save(employee);
         assertEquals(1, employeeQueryRepository.findAll().size());
     }
 
     @Test
     void shouldNotAcceptSecondTimesheetWithoutInvoice() {
-        EmployeeId id = employeeService.createNew(FirstName.of("Krzysztof"), LastName.of("Ślusarski"), Money.of(BigDecimal.TEN));
-        employeeService.addNewTimesheet(id, WorkHours.of(100));
+        Employee employee = new Employee(FirstName.of("Krzysztof"), LastName.of("Ślusarski"), Money.of(BigDecimal.TEN));
+        employee.addNewTimesheet(WorkHours.of(100));
         assertThrows(IllegalArgumentException.class, () -> {
-            employeeService.addNewTimesheet(id, WorkHours.of(100));
+            employee.addNewTimesheet(WorkHours.of(100));
         });
     }
 
     @Test
     void shouldAcceptInvoiceToTheTimesheet() {
-        EmployeeId id = employeeService.createNew(FirstName.of("Krzysztof"), LastName.of("Ślusarski"), Money.of(BigDecimal.TEN));
-        employeeService.addNewTimesheet(id, WorkHours.of(100));
-        employeeService.addNewInvoice(id, Money.of(BigDecimal.valueOf(1000L)));
-        assertNull(employeeQueryRepository.getById(id).getLastNotSettledTimesheetWorkTime());
+        Employee employee = new Employee(FirstName.of("Krzysztof"), LastName.of("Ślusarski"), Money.of(BigDecimal.TEN));
+        employee.addNewTimesheet(WorkHours.of(100));
+        employee.addNewInvoice(Money.of(BigDecimal.valueOf(1000L)));
+        employeeRepository.save(employee);
+        assertNull(employeeQueryRepository.getById(employee.getId()).getLastNotSettledTimesheetWorkTime());
     }
 
     @Test
     void shouldAcceptSecondTimesheetAfterInvoice() {
-        EmployeeId id = employeeService.createNew(FirstName.of("Krzysztof"), LastName.of("Ślusarski"), Money.of(BigDecimal.TEN));
-        employeeService.addNewTimesheet(id, WorkHours.of(100));
-        employeeService.addNewInvoice(id, Money.of(BigDecimal.valueOf(1000L)));
-        employeeService.addNewTimesheet(id, WorkHours.of(100));
+        Employee employee = new Employee(FirstName.of("Krzysztof"), LastName.of("Ślusarski"), Money.of(BigDecimal.TEN));
+        employee.addNewTimesheet(WorkHours.of(100));
+        employee.addNewInvoice(Money.of(BigDecimal.valueOf(1000L)));
+        employee.addNewTimesheet(WorkHours.of(100));
     }
 
     @Test
     void shouldNotAcceptInvoiceWithWrongAmount() {
-        EmployeeId id = employeeService.createNew(FirstName.of("Krzysztof"), LastName.of("Ślusarski"), Money.of(BigDecimal.TEN));
-        employeeService.addNewTimesheet(id, WorkHours.of(100));
+        Employee employee = new Employee(FirstName.of("Krzysztof"), LastName.of("Ślusarski"), Money.of(BigDecimal.TEN));
+        employee.addNewTimesheet(WorkHours.of(100));
         assertThrows(IllegalArgumentException.class, () -> {
-            employeeService.addNewInvoice(id, Money.of(BigDecimal.valueOf(1001L)));
+            employee.addNewInvoice(Money.of(BigDecimal.valueOf(1001L)));
         });
     }
 }
