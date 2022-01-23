@@ -12,7 +12,8 @@
 		<module>application</module>
 		<module>common-db</module>
         <module>external-service-adapter</module>
-	</modules>
+        <module>external-service-domain</module>
+    </modules>
 
     <parent>
 		<groupId>org.springframework.boot</groupId>
@@ -77,6 +78,11 @@
 			<dependency>
 				<groupId>pl.ks.hex</groupId>
 				<artifactId>external-service-adapter</artifactId>
+				<version>${revision}</version>
+			</dependency>
+			<dependency>
+				<groupId>pl.ks.hex</groupId>
+				<artifactId>external-service-domain</artifactId>
 				<version>${revision}</version>
 			</dependency>
 			<dependency>

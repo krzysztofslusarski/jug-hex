@@ -24,5 +24,9 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+        <dependency>
+            <groupId>pl.ks.hex</groupId>
+            <artifactId>external-service-domain</artifactId>
+        </dependency>
     </dependencies>
 </project>
