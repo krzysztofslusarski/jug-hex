@@ -7,15 +7,19 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import pl.ks.hex.common.event.DomainIncomingEvent;
-import pl.ks.hex.common.model.WorkHours;
+import pl.ks.hex.common.model.FirstName;
+import pl.ks.hex.common.model.LastName;
+import pl.ks.hex.common.model.Money;
 
 @Value
 @Builder
 @NoArgsConstructor(force = true, access = AccessLevel.PROTECTED)
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class NewTimesheetAdded implements DomainIncomingEvent {
+public class Hired implements DomainIncomingEvent {
     Instant when;
     Integer sequenceNumber;
 
-    WorkHours hours;
+    FirstName firstName;
+    LastName lastName;
+    Money hourlyEarnings;
 }

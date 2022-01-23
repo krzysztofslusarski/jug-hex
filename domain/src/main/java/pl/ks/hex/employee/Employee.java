@@ -15,9 +15,9 @@ import pl.ks.hex.common.model.FirstName;
 import pl.ks.hex.common.model.LastName;
 import pl.ks.hex.common.model.Money;
 import pl.ks.hex.common.model.WorkHours;
-import pl.ks.hex.employee.event.incoming.Created;
-import pl.ks.hex.employee.event.incoming.NewInvoiceAdded;
-import pl.ks.hex.employee.event.incoming.NewTimesheetAdded;
+import pl.ks.hex.employee.event.incoming.Hired;
+import pl.ks.hex.employee.event.incoming.InvoiceIssued;
+import pl.ks.hex.employee.event.incoming.TimesheetReported;
 import pl.ks.hex.employee.event.outgoing.NewInvoiceConfirmed;
 
 @Getter(AccessLevel.PACKAGE)
@@ -42,40 +42,40 @@ public class Employee {
     }
 
     public Employee(FirstName firstName, LastName lastName, Money hourlyEarnings) {
-        Created created = Created.builder()
+        Hired hired = Hired.builder()
                 .when(Instant.now())
                 .sequenceNumber(sequenceNumber++)
                 .firstName(firstName)
                 .lastName(lastName)
                 .hourlyEarnings(hourlyEarnings)
                 .build();
-        handleWithAppend(created);
+        handleWithAppend(hired);
     }
 
-    private void handle(Created created) {
+    private void handle(Hired hired) {
         this.id = EmployeeId.of(UUID.randomUUID());
-        this.firstName = created.getFirstName();
-        this.lastName = created.getLastName();
-        this.hourlyEarnings = created.getHourlyEarnings();
+        this.firstName = hired.getFirstName();
+        this.lastName = hired.getLastName();
+        this.hourlyEarnings = hired.getHourlyEarnings();
     }
 
-    public void addNewTimesheet(WorkHours hours) {
+    public void reportTimesheet(WorkHours hours) {
         if (lastNotSettledTimesheetWorkTime != null) {
             throw new IllegalArgumentException("You need to add the invoice");
         }
-        NewTimesheetAdded newTimesheetAdded = NewTimesheetAdded.builder()
+        TimesheetReported timesheetReported = TimesheetReported.builder()
                 .when(Instant.now())
                 .sequenceNumber(sequenceNumber++)
                 .hours(hours)
                 .build();
-        handleWithAppend(newTimesheetAdded);
+        handleWithAppend(timesheetReported);
     }
 
-    private void handle(NewTimesheetAdded newTimesheetAdded) {
-        lastNotSettledTimesheetWorkTime = newTimesheetAdded.getHours();
+    private void handle(TimesheetReported timesheetReported) {
+        lastNotSettledTimesheetWorkTime = timesheetReported.getHours();
     }
 
-    public void addNewInvoice(Money payment) {
+    public void issueInvoice(Money payment) {
         if (lastNotSettledTimesheetWorkTime == null) {
             throw new IllegalArgumentException("You need to first add a new timesheet");
         }
@@ -84,18 +84,18 @@ public class Employee {
             throw new IllegalArgumentException("Wrong value on invoice, should be: " + toInvoice);
         }
 
-        NewInvoiceAdded newInvoiceAdded = NewInvoiceAdded.builder()
+        InvoiceIssued invoiceIssued = InvoiceIssued.builder()
                 .when(Instant.now())
                 .sequenceNumber(sequenceNumber++)
                 .payment(payment)
                 .build();
-        handleWithAppend(newInvoiceAdded);
+        handleWithAppend(invoiceIssued);
     }
 
-    private void handle(NewInvoiceAdded newInvoiceAdded) {
+    private void handle(InvoiceIssued invoiceIssued) {
         eventsToPublish.add(NewInvoiceConfirmed.builder()
                 .employeeId(id)
-                .payment(newInvoiceAdded.getPayment())
+                .payment(invoiceIssued.getPayment())
                 .build()
         );
         lastNotSettledTimesheetWorkTime = null;
@@ -107,12 +107,12 @@ public class Employee {
     }
 
     private void handleDispatcher(DomainIncomingEvent event) {
-        if (event instanceof Created created) {
-            handle(created);
-        } else if (event instanceof NewTimesheetAdded newTimesheetAdded) {
-            handle(newTimesheetAdded);
-        } else if (event instanceof NewInvoiceAdded newInvoiceAdded) {
-            handle(newInvoiceAdded);
+        if (event instanceof Hired hired) {
+            handle(hired);
+        } else if (event instanceof TimesheetReported timesheetReported) {
+            handle(timesheetReported);
+        } else if (event instanceof InvoiceIssued invoiceIssued) {
+            handle(invoiceIssued);
         }
     }
 
