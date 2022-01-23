@@ -5,10 +5,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import pl.ks.hex.common.command.CommandHandler;
+import pl.ks.hex.employee.Employee;
+import pl.ks.hex.employee.EmployeeRepository;
 import pl.ks.hex.police.ConvictedStatus;
 import pl.ks.hex.police.PoliceService;
-import pl.ks.hex.supporting.employee.Employee;
-import pl.ks.hex.supporting.employee.EmployeeRepository;
 
 @Component
 @RequiredArgsConstructor

@@ -1,4 +1,4 @@
-package pl.ks.hex.supporting.employee;
+package pl.ks.hex.employee;
 
 import lombok.Builder;
 import lombok.Value;

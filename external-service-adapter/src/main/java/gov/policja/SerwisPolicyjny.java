@@ -19,6 +19,6 @@ public class SerwisPolicyjny {
         // ..
         // ..
         // Tutaj jest prawdziwe wywołanie
-        return "jest";
+        return "niejest";
     }
 }
