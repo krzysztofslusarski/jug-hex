@@ -7,15 +7,15 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import pl.ks.hex.common.event.DomainIncomingEvent;
-import pl.ks.hex.common.model.Money;
+import pl.ks.hex.common.model.WorkHours;
 
 @Value
 @Builder
 @NoArgsConstructor(force = true, access = AccessLevel.PROTECTED)
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class NewInvoiceAdded implements DomainIncomingEvent {
+public class TimesheetReported implements DomainIncomingEvent {
     Instant when;
     Integer sequenceNumber;
 
-    Money payment;
+    WorkHours hours;
 }
