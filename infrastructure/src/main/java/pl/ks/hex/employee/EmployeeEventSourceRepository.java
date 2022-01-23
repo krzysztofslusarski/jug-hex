@@ -7,12 +7,16 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import pl.ks.hex.common.event.DomainIncomingEvent;
 import pl.ks.hex.common.event.DomainIncomingEventSerializer;
 
+@Slf4j
 @RequiredArgsConstructor
 class EmployeeEventSourceRepository implements EmployeeRepository {
     private final EntityManager entityManager;
+    private final ApplicationEventPublisher applicationEventPublisher;
     private final EmployeeEventStreamRepositoryJpa employeeEventStreamRepositoryJpa;
     private final DomainIncomingEventSerializer domainIncomingEventSerializer;
 
@@ -65,6 +69,16 @@ class EmployeeEventSourceRepository implements EmployeeRepository {
         );
 
         employee.getPendingEvents().clear();
+
+        employee.getEventsToPublish().forEach(event -> {
+            try {
+                log.info("Publishing: {}", event);
+                applicationEventPublisher.publishEvent(event);
+            } catch (RuntimeException e) {
+                log.warn("Ignoring exception", e);
+            }
+        });
+        employee.getEventsToPublish().clear();
         employeeEventStreamRepositoryJpa.save(stream);
     }
 }

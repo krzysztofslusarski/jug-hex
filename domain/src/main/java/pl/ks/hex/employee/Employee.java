@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import pl.ks.hex.common.event.DomainIncomingEvent;
+import pl.ks.hex.common.event.DomainOutgoingEvent;
 import pl.ks.hex.common.model.FirstName;
 import pl.ks.hex.common.model.LastName;
 import pl.ks.hex.common.model.Money;
@@ -17,6 +18,7 @@ import pl.ks.hex.common.model.WorkHours;
 import pl.ks.hex.employee.event.incoming.Created;
 import pl.ks.hex.employee.event.incoming.NewInvoiceAdded;
 import pl.ks.hex.employee.event.incoming.NewTimesheetAdded;
+import pl.ks.hex.employee.event.outgoing.NewInvoiceConfirmed;
 
 @Getter(AccessLevel.PACKAGE)
 @ToString
@@ -25,6 +27,7 @@ import pl.ks.hex.employee.event.incoming.NewTimesheetAdded;
 public class Employee {
     private int sequenceNumber;
     private List<DomainIncomingEvent> pendingEvents = new ArrayList<>();
+    private List<DomainOutgoingEvent> eventsToPublish = new ArrayList<>();
 
     private EmployeeId id;
     private Long version;
@@ -90,6 +93,11 @@ public class Employee {
     }
 
     private void handle(NewInvoiceAdded newInvoiceAdded) {
+        eventsToPublish.add(NewInvoiceConfirmed.builder()
+                .employeeId(id)
+                .payment(newInvoiceAdded.getPayment())
+                .build()
+        );
         lastNotSettledTimesheetWorkTime = null;
     }
 
@@ -111,6 +119,7 @@ public class Employee {
     static Employee recreate(List<DomainIncomingEvent> events, Long version) {
         Employee employee = new Employee(version, events.size());
         events.forEach(employee::handleDispatcher);
+        employee.eventsToPublish.clear();
         return employee;
     }
 
