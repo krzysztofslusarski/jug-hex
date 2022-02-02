@@ -3,9 +3,11 @@ package pl.ks.hex.employee;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
+import javax.persistence.OptimisticLockException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -56,6 +58,10 @@ class EmployeeEventSourceRepository implements EmployeeRepository {
                     employeeEventStream.setEmployeeId(employee.getId().getValue());
                     return employeeEventStream;
                 });
+
+        if (!Objects.equals(stream.getVersion(), employee.getVersion())) {
+            throw new OptimisticLockException();
+        }
 
         stream.getEvents().addAll(
                 employee.getPendingEvents().stream()
