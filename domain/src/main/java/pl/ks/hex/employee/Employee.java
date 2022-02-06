@@ -25,8 +25,8 @@ import pl.ks.hex.employee.event.outgoing.NewInvoiceConfirmed;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Employee {
     private int sequenceNumber;
-    private List<DomainIncomingEvent> pendingEvents = new ArrayList<>();
-    private List<DomainOutgoingEvent> eventsToPublish = new ArrayList<>();
+    private List<DomainIncomingEvent> pendingIncomingEvents = new ArrayList<>();
+    private List<DomainOutgoingEvent> pendingOutgoingEvents = new ArrayList<>();
 
     @Getter(AccessLevel.PACKAGE)
     private EmployeeId id;
@@ -95,7 +95,7 @@ public class Employee {
     }
 
     private void handle(InvoiceIssued invoiceIssued) {
-        eventsToPublish.add(NewInvoiceConfirmed.builder()
+        pendingOutgoingEvents.add(NewInvoiceConfirmed.builder()
                 .employeeId(id)
                 .payment(invoiceIssued.getPayment())
                 .build()
@@ -104,7 +104,7 @@ public class Employee {
     }
 
     private void handleWithAppend(DomainIncomingEvent event) {
-        pendingEvents.add(event);
+        pendingIncomingEvents.add(event);
         handleDispatcher(event);
     }
 
@@ -121,13 +121,19 @@ public class Employee {
     static Employee recreate(List<DomainIncomingEvent> events, Long version) {
         Employee employee = new Employee(version, events.size());
         events.forEach(employee::handleDispatcher);
-        employee.eventsToPublish.clear();
+        employee.pendingOutgoingEvents.clear();
         return employee;
     }
 
-    List<DomainIncomingEvent> getAndClearPendingEvents() {
-        List<DomainIncomingEvent> ret = pendingEvents;
-        pendingEvents = new ArrayList<>();
+    List<DomainIncomingEvent> getAndClearPendingIncomingEvents() {
+        List<DomainIncomingEvent> ret = pendingIncomingEvents;
+        pendingIncomingEvents = new ArrayList<>();
+        return ret;
+    }
+
+    List<DomainOutgoingEvent> getAndClearPendingOutgoingEvents() {
+        List<DomainOutgoingEvent> ret = pendingOutgoingEvents;;
+        pendingOutgoingEvents = new ArrayList<>();
         return ret;
     }
 }

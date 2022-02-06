@@ -64,7 +64,7 @@ class EmployeeEventSourceRepository implements EmployeeRepository {
         }
 
         stream.getEvents().addAll(
-                employee.getAndClearPendingEvents().stream()
+                employee.getAndClearPendingIncomingEvents().stream()
                         .map(domainIncomingEventSerializer::serialize)
                         .map(bytes -> {
                             EmployeeEvent employeeEvent = new EmployeeEvent();
@@ -75,7 +75,7 @@ class EmployeeEventSourceRepository implements EmployeeRepository {
         );
 
 
-        employee.getEventsToPublish().forEach(event -> {
+        employee.getAndClearPendingOutgoingEvents().forEach(event -> {
             try {
                 log.info("Publishing: {}", event);
                 applicationEventPublisher.publishEvent(event);
@@ -83,7 +83,7 @@ class EmployeeEventSourceRepository implements EmployeeRepository {
                 log.warn("Ignoring exception", e);
             }
         });
-        employee.getEventsToPublish().clear();
+
         employeeEventStreamRepositoryJpa.save(stream);
     }
 }
