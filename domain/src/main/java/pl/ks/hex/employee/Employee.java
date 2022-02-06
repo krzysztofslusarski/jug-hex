@@ -14,9 +14,9 @@ import pl.ks.hex.common.model.FirstName;
 import pl.ks.hex.common.model.LastName;
 import pl.ks.hex.common.model.Money;
 import pl.ks.hex.common.model.WorkHours;
-import pl.ks.hex.employee.event.incoming.Hired;
-import pl.ks.hex.employee.event.incoming.InvoiceIssued;
-import pl.ks.hex.employee.event.incoming.TimesheetReported;
+import pl.ks.hex.employee.event.incoming.Created;
+import pl.ks.hex.employee.event.incoming.NewInvoiceAdded;
+import pl.ks.hex.employee.event.incoming.NewTimesheetAdded;
 
 @ToString
 @EqualsAndHashCode(of = "id")
@@ -41,40 +41,40 @@ public class Employee {
     }
 
     public Employee(FirstName firstName, LastName lastName, Money hourlyEarnings) {
-        Hired hired = Hired.builder()
+        Created created = Created.builder()
                 .when(Instant.now())
                 .sequenceNumber(sequenceNumber++)
                 .firstName(firstName)
                 .lastName(lastName)
                 .hourlyEarnings(hourlyEarnings)
                 .build();
-        handleWithAppend(hired);
+        handleWithAppend(created);
     }
 
-    private void handle(Hired hired) {
+    private void handle(Created created) {
         this.id = EmployeeId.of(UUID.randomUUID());
-        this.firstName = hired.getFirstName();
-        this.lastName = hired.getLastName();
-        this.hourlyEarnings = hired.getHourlyEarnings();
+        this.firstName = created.getFirstName();
+        this.lastName = created.getLastName();
+        this.hourlyEarnings = created.getHourlyEarnings();
     }
 
-    public void reportTimesheet(WorkHours hours) {
+    public void addNewTimesheet(WorkHours hours) {
         if (lastNotSettledTimesheetWorkTime != null) {
             throw new IllegalArgumentException("You need to add the invoice");
         }
-        TimesheetReported timesheetReported = TimesheetReported.builder()
+        NewTimesheetAdded newTimesheetAdded = NewTimesheetAdded.builder()
                 .when(Instant.now())
                 .sequenceNumber(sequenceNumber++)
                 .hours(hours)
                 .build();
-        handleWithAppend(timesheetReported);
+        handleWithAppend(newTimesheetAdded);
     }
 
-    private void handle(TimesheetReported timesheetReported) {
-        lastNotSettledTimesheetWorkTime = timesheetReported.getHours();
+    private void handle(NewTimesheetAdded newTimesheetAdded) {
+        lastNotSettledTimesheetWorkTime = newTimesheetAdded.getHours();
     }
 
-    public void issueInvoice(Money payment) {
+    public void addNewInvoice(Money payment) {
         if (lastNotSettledTimesheetWorkTime == null) {
             throw new IllegalArgumentException("You need to first add a new timesheet");
         }
@@ -83,15 +83,15 @@ public class Employee {
             throw new IllegalArgumentException("Wrong value on invoice, should be: " + toInvoice);
         }
 
-        InvoiceIssued invoiceIssued = InvoiceIssued.builder()
+        NewInvoiceAdded newInvoiceAdded = NewInvoiceAdded.builder()
                 .when(Instant.now())
                 .sequenceNumber(sequenceNumber++)
                 .payment(payment)
                 .build();
-        handleWithAppend(invoiceIssued);
+        handleWithAppend(newInvoiceAdded);
     }
 
-    private void handle(InvoiceIssued invoiceIssued) {
+    private void handle(NewInvoiceAdded newInvoiceAdded) {
         lastNotSettledTimesheetWorkTime = null;
     }
 
@@ -101,12 +101,12 @@ public class Employee {
     }
 
     private void handleDispatcher(DomainIncomingEvent event) {
-        if (event instanceof Hired hired) {
-            handle(hired);
-        } else if (event instanceof TimesheetReported timesheetReported) {
-            handle(timesheetReported);
-        } else if (event instanceof InvoiceIssued invoiceIssued) {
-            handle(invoiceIssued);
+        if (event instanceof Created created) {
+            handle(created);
+        } else if (event instanceof NewTimesheetAdded newTimesheetAdded) {
+            handle(newTimesheetAdded);
+        } else if (event instanceof NewInvoiceAdded newInvoiceAdded) {
+            handle(newInvoiceAdded);
         }
     }
 
