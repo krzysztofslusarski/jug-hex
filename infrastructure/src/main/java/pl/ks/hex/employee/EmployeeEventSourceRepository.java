@@ -60,7 +60,7 @@ class EmployeeEventSourceRepository implements EmployeeRepository {
         }
 
         stream.getEvents().addAll(
-                employee.getPendingEvents().stream()
+                employee.getAndClearPendingEvents().stream()
                         .map(domainIncomingEventSerializer::serialize)
                         .map(bytes -> {
                             EmployeeEvent employeeEvent = new EmployeeEvent();
@@ -70,7 +70,6 @@ class EmployeeEventSourceRepository implements EmployeeRepository {
                         .toList()
         );
 
-        employee.getPendingEvents().clear();
         employeeEventStreamRepositoryJpa.save(stream);
     }
 }
