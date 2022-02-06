@@ -20,7 +20,6 @@ import pl.ks.hex.employee.event.incoming.InvoiceIssued;
 import pl.ks.hex.employee.event.incoming.TimesheetReported;
 import pl.ks.hex.employee.event.outgoing.NewInvoiceConfirmed;
 
-@Getter(AccessLevel.PACKAGE)
 @ToString
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -29,8 +28,11 @@ public class Employee {
     private List<DomainIncomingEvent> pendingEvents = new ArrayList<>();
     private List<DomainOutgoingEvent> eventsToPublish = new ArrayList<>();
 
+    @Getter(AccessLevel.PACKAGE)
     private EmployeeId id;
+    @Getter(AccessLevel.PACKAGE)
     private Long version;
+
     private FirstName firstName;
     private LastName lastName;
     private Money hourlyEarnings;
@@ -123,4 +125,9 @@ public class Employee {
         return employee;
     }
 
+    List<DomainIncomingEvent> getAndClearPendingEvents() {
+        List<DomainIncomingEvent> ret = pendingEvents;
+        pendingEvents = new ArrayList<>();
+        return ret;
+    }
 }
