@@ -10,6 +10,7 @@ import pl.ks.hex.common.event.DomainIncomingEvent;
 import pl.ks.hex.common.model.FirstName;
 import pl.ks.hex.common.model.LastName;
 import pl.ks.hex.common.model.Money;
+import pl.ks.hex.employee.EmployeeId;
 
 @Value
 @Builder
@@ -19,6 +20,7 @@ public class Created implements DomainIncomingEvent {
     Instant when;
     Integer sequenceNumber;
 
+    EmployeeId id;
     FirstName firstName;
     LastName lastName;
     Money hourlyEarnings;
