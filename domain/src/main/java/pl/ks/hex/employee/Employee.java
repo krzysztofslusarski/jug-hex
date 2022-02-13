@@ -44,6 +44,7 @@ public class Employee {
         Hired hired = Hired.builder()
                 .when(Instant.now())
                 .sequenceNumber(sequenceNumber++)
+                .id(EmployeeId.of(UUID.randomUUID()))
                 .firstName(firstName)
                 .lastName(lastName)
                 .hourlyEarnings(hourlyEarnings)
@@ -52,7 +53,7 @@ public class Employee {
     }
 
     private void handle(Hired hired) {
-        this.id = EmployeeId.of(UUID.randomUUID());
+        this.id = hired.getId();
         this.firstName = hired.getFirstName();
         this.lastName = hired.getLastName();
         this.hourlyEarnings = hired.getHourlyEarnings();
